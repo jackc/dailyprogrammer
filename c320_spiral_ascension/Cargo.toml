@@ -1,0 +1,6 @@
+[package]
+name = "c320_spiral_ascension"
+version = "0.1.0"
+authors = ["Jack Christensen <jack@jackchristensen.com>"]
+
+[dependencies]
