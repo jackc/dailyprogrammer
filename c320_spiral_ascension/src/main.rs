@@ -1,5 +1,6 @@
 use std::io;
 use std::io::Write;
+use std::ops;
 
 fn main() {
     print!("Enter a number:");
@@ -41,8 +42,7 @@ fn comp_spiral(num: i32) -> Grid {
             }
             decr_run_len = !decr_run_len;
         }
-        pos.x += curr_dir.x;
-        pos.y += curr_dir.y;
+        pos = pos + *curr_dir;
     }
 
     return grid;
@@ -59,10 +59,18 @@ fn print_spiral(grid: &Grid) {
     }
 }
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct Vec2 {
     x: i32,
     y: i32,
+}
+
+impl ops::Add<Vec2> for Vec2 {
+    type Output = Vec2;
+
+    fn add(self, rhs: Vec2) -> Vec2 {
+        return Vec2 {x: self.x + rhs.x, y: self.y + rhs.y};
+    }
 }
 
 #[derive(Debug)]
