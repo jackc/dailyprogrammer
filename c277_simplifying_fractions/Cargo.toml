@@ -1,0 +1,6 @@
+[package]
+name = "c277_simplifying_fractions"
+version = "0.1.0"
+authors = ["Jack Christensen <jack@jackchristensen.com>"]
+
+[dependencies]
