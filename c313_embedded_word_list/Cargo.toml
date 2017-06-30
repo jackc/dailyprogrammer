@@ -1,0 +1,6 @@
+[package]
+name = "c313_embedded_word_list"
+version = "0.1.0"
+authors = ["Hashrocket Workstation <dev@hashrocket.com>"]
+
+[dependencies]
