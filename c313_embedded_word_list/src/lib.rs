@@ -20,80 +20,35 @@ pub fn is_embedded(world: &str, test: &str) -> bool {
 }
 
 pub fn embed(dest: &str, word: &str) -> String {
-    embed_slide(dest, word);
-    let l = embed_left(dest, word);
-    let r = embed_right(dest, word);
-    if l.len() < r.len() {
-        return l;
-    }
-    r
-}
+    let dest_chars: Vec<_> = dest.chars().collect();
+    let word_chars: Vec<_> = word.chars().collect();
+    let insert_list = embed_insert(&dest_chars, &word_chars);
 
-// embed_append is the simplest possible working embed
-fn embed_append(dest: &str, word: &str) -> String {
-    let mut s = dest.to_owned();
-    s.push_str(word);
-    s
-}
+    let mut insert_iter = insert_list.iter();
+    let mut insert_option = insert_iter.next();
 
-fn embed_left(dest: &str, word: &str) -> String {
-    if dest.len() == 0 {
-        return word.to_owned();
-    }
-    if word.len() == 0 {
-        return dest.to_owned();
-    }
+    let mut s = String::with_capacity(dest_chars.len() + word_chars.len());
 
-    let mut s = String::new();
-
-    let mut word_iter = word.chars().rev();
-    let mut wc_option = word_iter.next();
-
-    for dc in dest.chars().rev() {
-        s.insert(0, dc);
-        if let Some(wc) = wc_option {
-            if wc == dc {
-                wc_option = word_iter.next()
+    for (i, dc) in dest_chars.iter().enumerate() {
+        loop {
+            if let Some(insert) = insert_option {
+                if insert.beforeIdx == i {
+                    s.push(insert.value);
+                    insert_option = insert_iter.next();
+                } else {
+                    break;
+                }
+            } else {
+                break;
             }
         }
+        s.push(*dc);
     }
 
-    if let Some(wc) = wc_option {
-        s.insert(0, wc);
-        for wc in word_iter {
-            s.insert(0, wc);
-        }
-    }
-
-    s
-}
-
-fn embed_right(dest: &str, word: &str) -> String {
-    if dest.len() == 0 {
-        return word.to_owned();
-    }
-    if word.len() == 0 {
-        return dest.to_owned();
-    }
-
-    let mut s = String::new();
-
-    let mut word_iter = word.chars();
-    let mut wc_option = word_iter.next();
-
-    for dc in dest.chars() {
-        s.push(dc);
-        if let Some(wc) = wc_option {
-            if wc == dc {
-                wc_option = word_iter.next()
-            }
-        }
-    }
-
-    if let Some(wc) = wc_option {
-        s.push(wc);
-        for wc in word_iter {
-            s.push(wc);
+    if let Some(insert) = insert_option {
+        s.push(insert.value);
+        for insert in insert_iter {
+            s.push(insert.value);
         }
     }
 
@@ -106,19 +61,70 @@ struct Insert {
     value: char,
 }
 
-fn embed_insert(dest: &[char], word: &[char], destOffset: usize) -> Vec<Insert> {
+fn embed_insert(dest: &[char], word: &[char]) -> Vec<Insert> {
+    if dest.len() == 0 {
+        return word.iter().map(|c| { Insert{beforeIdx: 0, value: *c} }).collect();
+    }
+
+    if word.len() == 0 {
+        return Vec::new();
+    }
+
+    let mut insert_list = Vec::with_capacity(word.len());
+
+    let offset = dest.len();
+    for insert in embed_insert(&dest[offset..], word) {
+        insert_list.push(Insert{beforeIdx: offset+insert.beforeIdx, value: insert.value});
+    }
+
+    return insert_list;
 
 
-    vec![Insert{beforeIdx: 0, value: ' '}]
+
+
+    let mut word_iter = word.iter();
+    let mut wc_option = word_iter.next();
+
+    for dc in dest.iter() {
+        if let Some(wc) = wc_option {
+            if wc == dc {
+                wc_option = word_iter.next()
+            }
+        }
+    }
+
+    if let Some(wc) = wc_option {
+        insert_list.push(Insert{beforeIdx: dest.len(), value: *wc});
+        for wc in word_iter {
+            insert_list.push(Insert{beforeIdx: dest.len(), value: *wc});
+        }
+    }
+
+    insert_list
 }
 
-fn embed_slide(dest: &str, word: &str) -> String {
-    let window_size = cmp::min(4, word.len());
+// fn next_insert(dest: &[char], value: char) -> Insert {
+//     for dc in dest.iter() {
+//         if let Some(wc) = wc_option {
+//             if wc == dc {
+//                 wc_option = word_iter.next()
+//             }
+//         }
+//     }
+// }
 
-    let chars: Vec<_> = word.chars().collect();
-    println!("{:?}", chars);
-    "foo".to_owned()
-}
+// fn embed_slide(dest: &str, word: &str) -> String {
+//     let dest_chars: Vec<_> = dest.chars().collect();
+//     let word_chars: Vec<_> = word.chars().collect();
+//     let insert_list = embed_insert(&dest_chars, &word_chars, 0);
+
+
+//     let window_size = cmp::min(4, word.len());
+
+//     let chars: Vec<_> = word.chars().collect();
+//     println!("{} {} {:?}", dest, word, insert_list);
+//     "foo".to_owned()
+// }
 
 
 #[cfg(test)]
