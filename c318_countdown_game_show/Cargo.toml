@@ -1,0 +1,6 @@
+[package]
+name = "c318_countdown_game_show"
+version = "0.1.0"
+authors = ["Jack Christensen <jack@jackchristensen.com>"]
+
+[dependencies]
