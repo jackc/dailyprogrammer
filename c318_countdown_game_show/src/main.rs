@@ -1,6 +1,6 @@
 extern crate c318_countdown_game_show;
 
-use std::io::{self, Read};
+use std::io::{self};
 use c318_countdown_game_show::*;
 
 fn main() {
@@ -11,10 +11,10 @@ fn main() {
         .map(|s| s.parse::<i32>().unwrap() )
         .collect::<Vec<i32>>();
 
-    let result = numbers[numbers.len()-1];
+    let goal = numbers[numbers.len()-1];
     let numbers = &numbers[..numbers.len()-1];
 
-    solve(numbers, result);
+    let formula = solve(numbers, goal);
 
-    println!("{:?} -> {}", numbers, result);
+    println!("{:?} -> {}", formula, formula.eval());
 }
