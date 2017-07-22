@@ -57,3 +57,42 @@ pub fn solve(numbers: &[i32], goal: i32) -> Formula {
 
     Formula{terms: terms}
 }
+
+pub struct RepeatedPermutationIterator<T> {
+    indices: Vec<usize>,
+    alphabet: Vec<T>,
+}
+
+impl<T> RepeatedPermutationIterator<T> {
+    pub fn new(alphabet: Vec<T>, size: usize) -> RepeatedPermutationIterator<T> {
+        let mut iter = RepeatedPermutationIterator{
+            indices: vec![0, size],
+            alphabet: alphabet,
+        };
+        iter.indices[0] -= 1;
+        iter
+    }
+}
+
+impl<T> Iterator for RepeatedPermutationIterator<T> {
+    type Item = Vec<T>;
+
+    fn next(&mut self) -> Option<Vec<T>> {
+        self.indices[0] += 1;
+
+        let mut carry_idx = 0;
+        while carry_idx < self.indices.len() && self.indices[carry_idx] == self.alphabet.len() {
+            self.indices[carry_idx] = 0;
+            carry_idx += 1;
+            if carry_idx < self.indices.len() {
+                self.indices[carry_idx] += 1;
+            }
+        }
+
+        if carry_idx < self.indices.len() {
+            Some(self.indices.iter().map(|i| &self.alphabet[*i].clone()).collect())
+        } else {
+            None
+        }
+    }
+}
