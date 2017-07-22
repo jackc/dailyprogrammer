@@ -58,13 +58,13 @@ pub fn solve(numbers: &[i32], goal: i32) -> Formula {
     Formula{terms: terms}
 }
 
-pub struct RepeatedPermutationIterator<T> {
+pub struct RepeatedPermutationIterator<'a, T: 'a> {
     indices: Vec<usize>,
-    alphabet: Vec<T>,
+    alphabet: &'a Vec<T>,
 }
 
-impl<T> RepeatedPermutationIterator<T> {
-    pub fn new(alphabet: Vec<T>, size: usize) -> RepeatedPermutationIterator<T> {
+impl<'a, T> RepeatedPermutationIterator<'a, T> {
+    pub fn new(alphabet: &'a Vec<T>, size: usize) -> RepeatedPermutationIterator<T> {
         let mut iter = RepeatedPermutationIterator{
             indices: vec![0, size],
             alphabet: alphabet,
@@ -74,10 +74,10 @@ impl<T> RepeatedPermutationIterator<T> {
     }
 }
 
-impl<T> Iterator for RepeatedPermutationIterator<T> {
-    type Item = Vec<T>;
+impl<'a, T> Iterator for RepeatedPermutationIterator<'a, T> {
+    type Item = Vec<&'a T>;
 
-    fn next(&mut self) -> Option<Vec<T>> {
+    fn next(&mut self) -> Option<Vec<&T>> {
         self.indices[0] += 1;
 
         let mut carry_idx = 0;
@@ -90,7 +90,7 @@ impl<T> Iterator for RepeatedPermutationIterator<T> {
         }
 
         if carry_idx < self.indices.len() {
-            Some(self.indices.iter().map(|i| &self.alphabet[*i].clone()).collect())
+            Some(self.indices.iter().map(|i| &self.alphabet[*i]).collect())
         } else {
             None
         }
