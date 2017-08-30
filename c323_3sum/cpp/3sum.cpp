@@ -37,8 +37,8 @@ int main() {
     answers.resize(std::distance(answers.begin(), new_end));
 
     for (auto a : answers) {
-      std::cout << a[0] << ' ' << a[1] << ' ' << a[2] << std::endl;
+      std::cout << a[0] << ' ' << a[1] << ' ' << a[2] << '\n';
     }
-    std::cout << std::endl;
+    std::cout << '\n';
   }
 }
