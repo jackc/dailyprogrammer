@@ -9,6 +9,8 @@
 typedef std::array<int64_t, 3> answer;
 
 int main() {
+   std::ios::sync_with_stdio(false);
+
   for (std::string line; std::getline(std::cin, line);) {
     std::vector<int64_t> nums;
     std::stringstream ss(line);
