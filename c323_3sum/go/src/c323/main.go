@@ -29,12 +29,12 @@ func main() {
 
 		sort.Slice(nums, func(i, j int) bool { return nums[i] < nums[j] })
 
-		answers := [][]int64{}
+		answers := [][3]int64{}
 		for i := 0; i < len(nums); i++ {
 			for j := i + 1; j < len(nums); j++ {
 				for k := j + 1; k < len(nums); k++ {
 					if nums[i]+nums[j]+nums[k] == 0 {
-						answers = append(answers, []int64{nums[i], nums[j], nums[k]})
+						answers = append(answers, [3]int64{nums[i], nums[j], nums[k]})
 					}
 				}
 			}
@@ -42,13 +42,11 @@ func main() {
 
 		if len(answers) > 0 {
 			sort.Slice(answers, func(i, j int) bool {
-				return (answers[i][0] < answers[j][0]) ||
-					(answers[i][0] == answers[j][0] && answers[i][1] < answers[j][1]) ||
-					(answers[i][0] == answers[j][0] && answers[i][1] == answers[j][1] && answers[i][2] < answers[j][2])
+				return (answers[i] < answers[j])
 			})
 
 			uniqAnswers := make([]string, 0, len(answers))
-			var prevAnswer []int64
+			var prevAnswer [3]int64
 			for _, a := range answers {
 				if !reflect.DeepEqual(prevAnswer, a) {
 					s := fmt.Sprintf("%d %d %d", a[0], a[1], a[2])
