@@ -42,13 +42,15 @@ func main() {
 
 		if len(answers) > 0 {
 			sort.Slice(answers, func(i, j int) bool {
-				return (answers[i] < answers[j])
+				return (answers[i][0] < answers[j][0]) ||
+					(answers[i][0] == answers[j][0] && answers[i][1] < answers[j][1]) ||
+					(answers[i][0] == answers[j][0] && answers[i][1] == answers[j][1] && answers[i][2] < answers[j][2])
 			})
 
 			uniqAnswers := make([]string, 0, len(answers))
 			var prevAnswer [3]int64
 			for _, a := range answers {
-				if !reflect.DeepEqual(prevAnswer, a) {
+				if prevAnswer != a {
 					s := fmt.Sprintf("%d %d %d", a[0], a[1], a[2])
 					uniqAnswers = append(uniqAnswers, s)
 					prevAnswer = a
