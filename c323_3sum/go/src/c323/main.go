@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"reflect"
 	"sort"
 	"strconv"
 	"strings"
@@ -51,7 +50,7 @@ func main() {
 			var prevAnswer [3]int64
 			for _, a := range answers {
 				if prevAnswer != a {
-					s := fmt.Sprintf("%d %d %d", a[0], a[1], a[2])
+					s := strconv.FormatInt(a[0], 10) + " " + strconv.FormatInt(a[1], 10) + " " + strconv.FormatInt(a[2], 10)
 					uniqAnswers = append(uniqAnswers, s)
 					prevAnswer = a
 				}
