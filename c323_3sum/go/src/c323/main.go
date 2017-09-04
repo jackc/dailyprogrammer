@@ -12,6 +12,9 @@ import (
 )
 
 func main() {
+	bufstdout := bufio.NewWriter(os.Stdout)
+	defer bufstdout.Flush()
+
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		words := strings.Split(scanner.Text(), " ")
@@ -55,10 +58,10 @@ func main() {
 			}
 
 			for _, a := range uniqAnswers {
-				fmt.Println(a)
+				fmt.Fprintln(bufstdout, a)
 			}
 
-			fmt.Println()
+			fmt.Fprintln(bufstdout)
 		}
 	}
 	if err := scanner.Err(); err != nil {
