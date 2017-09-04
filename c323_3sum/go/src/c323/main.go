@@ -46,18 +46,13 @@ func main() {
 					(answers[i][0] == answers[j][0] && answers[i][1] == answers[j][1] && answers[i][2] < answers[j][2])
 			})
 
-			uniqAnswers := make([]string, 0, len(answers))
 			var prevAnswer [3]int64
 			for _, a := range answers {
 				if prevAnswer != a {
 					s := strconv.FormatInt(a[0], 10) + " " + strconv.FormatInt(a[1], 10) + " " + strconv.FormatInt(a[2], 10)
-					uniqAnswers = append(uniqAnswers, s)
+					fmt.Fprintln(bufstdout, s)
 					prevAnswer = a
 				}
-			}
-
-			for _, a := range uniqAnswers {
-				fmt.Fprintln(bufstdout, a)
 			}
 
 			fmt.Fprintln(bufstdout)
