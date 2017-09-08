@@ -47,34 +47,46 @@ func (w *World) idxFromCoord(x, y int) int {
 	return y*w.width + x
 }
 
-func Step(curr, next *World) {
+func Step(curr, next *World, target, reward, penalty Cell) {
 	for y := 0; y < curr.Height(); y++ {
 		for x := 0; x < curr.Width(); x++ {
-			var newValue Cell
-			neighborCount := countNeighbors(curr, x, y)
-			if curr.Get(x, y) == 1 {
-				if neighborCount == 2 || neighborCount == 3 {
-					newValue = 1
-				}
+			newValue := curr.Get(x, y)
+			if detectSubsetSum(curr, x, y, target) {
+				newValue += reward
 			} else {
-				if neighborCount == 3 {
-					newValue = 1
-				}
+				newValue -= penalty
 			}
 			next.Set(x, y, newValue)
 		}
 	}
 }
 
-func countNeighbors(w *World, x, y int) int {
-	return int(w.Get(x-1, y-1) +
-		w.Get(x, y-1) +
-		w.Get(x+1, y-1) +
+func detectSubsetSum(w *World, x, y int, want Cell) bool {
+	cells := [8]Cell{
+		w.Get(x-1, y-1),
+		w.Get(x, y-1),
+		w.Get(x+1, y-1),
 
-		w.Get(x-1, y) +
-		w.Get(x+1, y) +
+		w.Get(x-1, y),
+		w.Get(x+1, y),
 
-		w.Get(x-1, y+1) +
-		w.Get(x, y+1) +
-		w.Get(x+1, y+1))
+		w.Get(x-1, y+1),
+		w.Get(x, y+1),
+		w.Get(x+1, y+1),
+	}
+
+	for i := 1; i < 256; i++ {
+		sum := Cell(0)
+		for j := uint(0); j < uint(len(cells)); j++ {
+			if i&(1<<j) != 0 {
+				sum += cells[j]
+			}
+		}
+
+		if sum == want {
+			return true
+		}
+	}
+
+	return false
 }
