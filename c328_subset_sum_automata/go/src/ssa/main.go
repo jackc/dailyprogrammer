@@ -13,13 +13,14 @@ import (
 )
 
 var options struct {
-	width    int
-	height   int
-	target   int
-	reward   int
-	penalty  int
-	stepTime int
-	seed     int
+	width     int
+	height    int
+	target    int
+	reward    int
+	penalty   int
+	stepTime  int
+	seed      int
+	benchmark int
 }
 
 func Print(w *World, wr io.Writer) {
@@ -84,6 +85,7 @@ func main() {
 	flag.IntVar(&options.reward, "reward", 3, "reward value")
 	flag.IntVar(&options.penalty, "penalty", 1, "penalty value")
 	flag.IntVar(&options.stepTime, "steptime", 250, "time per step in milliseconds")
+	flag.IntVar(&options.benchmark, "benchmark", 0, "run benchmark of N steps and quit")
 	flag.IntVar(&options.seed, "seed", -1, "seed")
 	flag.Parse()
 
@@ -92,11 +94,6 @@ func main() {
 	}
 
 	rand.Seed(int64(options.seed))
-	err := termbox.Init()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer termbox.Close()
 
 	w := NewWorld(options.width, options.height)
 	wScratch := NewWorld(options.width, options.height)
@@ -106,6 +103,21 @@ func main() {
 			w.Set(x, y, Cell(rand.Intn(options.target+options.reward)))
 		}
 	}
+
+	if options.benchmark > 0 {
+		for i := 0; i < options.benchmark; i++ {
+			Step(w, wScratch, Cell(options.target), Cell(options.reward), Cell(options.penalty))
+			w, wScratch = wScratch, w
+		}
+		fmt.Println(w.Get(0, 0)) // Access results to ensure entire calculation cannot be removed by the optimizer.
+		os.Exit(0)
+	}
+
+	err := termbox.Init()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer termbox.Close()
 
 	eventQueue := make(chan termbox.Event)
 	go func() {
