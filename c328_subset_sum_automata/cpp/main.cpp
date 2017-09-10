@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <cstdlib>
@@ -19,6 +20,7 @@ struct config {
   int16_t target;
   int16_t penalty;
   int16_t reward;
+  int16_t max;
 
   int seed;
 
@@ -31,9 +33,10 @@ config parse_command_line(int argc, char** argv) {
 
   options_description desc{"Options"};
   desc.add_options()
-    ("benchmark", value<int64_t>()->default_value(10000), "run benchmark of N steps and quit")
+    ("benchmark", value<int64_t>()->default_value(0), "run benchmark of N steps and quit")
     ("height", value<int32_t>()->default_value(30), "height of the world")
     ("help,h", "Print this help message")
+    ("max", value<int16_t>()->default_value(15), "max value")
     ("penalty", value<int16_t>()->default_value(1), "penalty value")
     ("reward", value<int16_t>()->default_value(3), "reward value")
     ("seed", value<int>()->default_value(-1), "seed")
@@ -54,6 +57,7 @@ config parse_command_line(int argc, char** argv) {
   config c = {};
   c.benchmark = vm["benchmark"].as<int64_t>();
   c.height = vm["height"].as<int32_t>();
+  c.max = vm["max"].as<int16_t>();
   c.penalty = vm["penalty"].as<int16_t>();
   c.reward = vm["reward"].as<int16_t>();
   c.seed = vm["seed"].as<int>();
@@ -108,7 +112,7 @@ bool detect_subset_sum(world<CellType>& w, int32_t x, int32_t y, CellType want) 
 }
 
 template <class CellType>
-void step(world<CellType>& curr, world<CellType> &next, CellType target, CellType reward, CellType penalty) {
+void step(world<CellType>& curr, world<CellType> &next, CellType target, CellType reward, CellType penalty, CellType max) {
   for (int32_t y = 0; y < curr.get_height(); y++) {
     for (int32_t x = 0; x < curr.get_width(); x++) {
       auto new_value = curr.get(x, y);
@@ -117,6 +121,10 @@ void step(world<CellType>& curr, world<CellType> &next, CellType target, CellTyp
       } else {
         new_value -= penalty;
       }
+
+      new_value = std::max(CellType(0), new_value);
+      new_value = std::min(max, new_value);
+
       next.set(x, y, new_value);
     }
   }
@@ -146,7 +154,7 @@ int main(int argc, char** argv) {
 
     if (config.benchmark > 0) {
       for (int64_t i = 0; i < config.benchmark; i++) {
-        step(w, w_scratch, config.target, config.reward, config.penalty);
+        step(w, w_scratch, config.target, config.reward, config.penalty, config.max);
         std::swap(w, w_scratch);
       }
       print(w); // Access results to ensure entire calculation cannot be removed by the optimizer.
@@ -155,7 +163,7 @@ int main(int argc, char** argv) {
 
     while (true) {
       print(w);
-      step(w, w_scratch, config.target, config.reward, config.penalty);
+      step(w, w_scratch, config.target, config.reward, config.penalty, config.max);
       std::swap(w, w_scratch);
       std::this_thread::sleep_for(std::chrono::milliseconds(config.steptime));
     }

@@ -18,55 +18,30 @@ var options struct {
 	target    int
 	reward    int
 	penalty   int
+	max       int
 	stepTime  int
 	seed      int
 	benchmark int
 }
 
 func Print(w *World, wr io.Writer) {
-	values := map[Cell]termbox.Cell{
-		-9: termbox.Cell{Ch: '9', Fg: termbox.ColorWhite, Bg: termbox.ColorBlack},
-		-8: termbox.Cell{Ch: '8', Fg: termbox.ColorWhite, Bg: termbox.ColorBlack},
-		-7: termbox.Cell{Ch: '7', Fg: termbox.ColorWhite, Bg: termbox.ColorBlack},
-		-6: termbox.Cell{Ch: '6', Fg: termbox.ColorWhite, Bg: termbox.ColorBlack},
-		-5: termbox.Cell{Ch: '5', Fg: termbox.ColorWhite, Bg: termbox.ColorBlack},
-		-4: termbox.Cell{Ch: '4', Fg: termbox.ColorWhite, Bg: termbox.ColorBlack},
-		-3: termbox.Cell{Ch: '3', Fg: termbox.ColorWhite, Bg: termbox.ColorBlack},
-		-2: termbox.Cell{Ch: '2', Fg: termbox.ColorWhite, Bg: termbox.ColorBlack},
-		-1: termbox.Cell{Ch: '1', Fg: termbox.ColorWhite, Bg: termbox.ColorBlack},
-		0:  termbox.Cell{Ch: '0', Fg: termbox.ColorBlack, Bg: termbox.ColorWhite},
-		1:  termbox.Cell{Ch: '1', Fg: termbox.ColorBlack, Bg: termbox.ColorWhite},
-		2:  termbox.Cell{Ch: '2', Fg: termbox.ColorBlack, Bg: termbox.ColorWhite},
-		3:  termbox.Cell{Ch: '3', Fg: termbox.ColorBlack, Bg: termbox.ColorWhite},
-		4:  termbox.Cell{Ch: '4', Fg: termbox.ColorBlack, Bg: termbox.ColorWhite},
-		5:  termbox.Cell{Ch: '5', Fg: termbox.ColorBlack, Bg: termbox.ColorWhite},
-		6:  termbox.Cell{Ch: '6', Fg: termbox.ColorBlack, Bg: termbox.ColorWhite},
-		7:  termbox.Cell{Ch: '7', Fg: termbox.ColorBlack, Bg: termbox.ColorWhite},
-		8:  termbox.Cell{Ch: '8', Fg: termbox.ColorBlack, Bg: termbox.ColorWhite},
-		9:  termbox.Cell{Ch: '9', Fg: termbox.ColorBlack, Bg: termbox.ColorWhite},
-		10: termbox.Cell{Ch: 'A', Fg: termbox.ColorBlack, Bg: termbox.ColorWhite},
-		11: termbox.Cell{Ch: 'B', Fg: termbox.ColorBlack, Bg: termbox.ColorWhite},
-		12: termbox.Cell{Ch: 'C', Fg: termbox.ColorBlack, Bg: termbox.ColorWhite},
-		13: termbox.Cell{Ch: 'D', Fg: termbox.ColorBlack, Bg: termbox.ColorWhite},
-		14: termbox.Cell{Ch: 'E', Fg: termbox.ColorBlack, Bg: termbox.ColorWhite},
-		15: termbox.Cell{Ch: 'F', Fg: termbox.ColorBlack, Bg: termbox.ColorWhite},
-	}
+	values := [16]rune{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'}
 
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
 	for y := 0; y < w.Height(); y++ {
 		for x := 0; x < w.Width(); x++ {
 			cell := w.Get(x, y)
-			var termCell termbox.Cell
-			if cell < -9 {
-				termCell = values[-9]
+			var ch rune
+			if cell < 0 {
+				ch = '0'
 			} else if cell > 15 {
-				termCell = values[15]
+				ch = 'F'
 			} else {
-				termCell = values[cell]
+				ch = values[cell]
 			}
 
-			termbox.SetCell(x*2, y, termCell.Ch, termCell.Fg, termCell.Bg)
+			termbox.SetCell(x*2, y, ch, termbox.ColorWhite, termbox.ColorBlack)
 		}
 	}
 
@@ -84,6 +59,7 @@ func main() {
 	flag.IntVar(&options.target, "target", 5, "target value")
 	flag.IntVar(&options.reward, "reward", 3, "reward value")
 	flag.IntVar(&options.penalty, "penalty", 1, "penalty value")
+	flag.IntVar(&options.max, "max", 15, "max value")
 	flag.IntVar(&options.stepTime, "steptime", 250, "time per step in milliseconds")
 	flag.IntVar(&options.benchmark, "benchmark", 0, "run benchmark of N steps and quit")
 	flag.IntVar(&options.seed, "seed", -1, "seed")
@@ -106,7 +82,7 @@ func main() {
 
 	if options.benchmark > 0 {
 		for i := 0; i < options.benchmark; i++ {
-			Step(w, wScratch, Cell(options.target), Cell(options.reward), Cell(options.penalty))
+			Step(w, wScratch, Cell(options.target), Cell(options.reward), Cell(options.penalty), Cell(options.max))
 			w, wScratch = wScratch, w
 		}
 		fmt.Println(w.Get(0, 0)) // Access results to ensure entire calculation cannot be removed by the optimizer.
@@ -139,7 +115,7 @@ func main() {
 			}
 		case <-ticker.C:
 			Print(w, os.Stdout)
-			Step(w, wScratch, Cell(options.target), Cell(options.reward), Cell(options.penalty))
+			Step(w, wScratch, Cell(options.target), Cell(options.reward), Cell(options.penalty), Cell(options.max))
 			w, wScratch = wScratch, w
 		}
 	}

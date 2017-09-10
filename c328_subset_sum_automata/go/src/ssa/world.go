@@ -47,7 +47,7 @@ func (w *World) idxFromCoord(x, y int) int {
 	return y*w.width + x
 }
 
-func Step(curr, next *World, target, reward, penalty Cell) {
+func Step(curr, next *World, target, reward, penalty Cell, max Cell) {
 	for y := 0; y < curr.Height(); y++ {
 		for x := 0; x < curr.Width(); x++ {
 			newValue := curr.Get(x, y)
@@ -56,6 +56,13 @@ func Step(curr, next *World, target, reward, penalty Cell) {
 			} else {
 				newValue -= penalty
 			}
+
+			if newValue < 0 {
+				newValue = 0
+			} else if newValue > max {
+				newValue = max
+			}
+
 			next.Set(x, y, newValue)
 		}
 	}
