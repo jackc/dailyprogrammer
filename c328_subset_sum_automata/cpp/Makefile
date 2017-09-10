@@ -1,5 +1,5 @@
 P=ssa
-CXXFLAGS = -g -Wall -Werror -O3 -std=c++14
+CXXFLAGS = -g -Wall -Werror -O3 -std=c++14 -pthread
 LDLIBS=-lboost_program_options
 CXX=g++
 

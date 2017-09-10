@@ -47,24 +47,43 @@ func (w *World) idxFromCoord(x, y int) int {
 	return y*w.width + x
 }
 
-func Step(curr, next *World, target, reward, penalty Cell, max Cell) {
+func StepSerial(curr, next *World, target, reward, penalty Cell, max Cell) {
 	for y := 0; y < curr.Height(); y++ {
-		for x := 0; x < curr.Width(); x++ {
-			newValue := curr.Get(x, y)
-			if detectSubsetSum(curr, x, y, target) {
-				newValue += reward
-			} else {
-				newValue -= penalty
-			}
+		stepRow(curr, next, target, reward, penalty, max, y)
+	}
+}
 
-			if newValue < 0 {
-				newValue = 0
-			} else if newValue > max {
-				newValue = max
-			}
+func StepParallel(curr, next *World, target, reward, penalty Cell, max Cell) {
+	doneChan := make(chan struct{})
 
-			next.Set(x, y, newValue)
+	for y := 0; y < curr.Height(); y++ {
+		go func(y int) {
+			stepRow(curr, next, target, reward, penalty, max, y)
+			doneChan <- struct{}{}
+		}(y)
+	}
+
+	for y := 0; y < curr.Height(); y++ {
+		<-doneChan
+	}
+}
+
+func stepRow(curr, next *World, target, reward, penalty Cell, max Cell, y int) {
+	for x := 0; x < curr.Width(); x++ {
+		newValue := curr.Get(x, y)
+		if detectSubsetSum(curr, x, y, target) {
+			newValue += reward
+		} else {
+			newValue -= penalty
 		}
+
+		if newValue < 0 {
+			newValue = 0
+		} else if newValue > max {
+			newValue = max
+		}
+
+		next.Set(x, y, newValue)
 	}
 }
 

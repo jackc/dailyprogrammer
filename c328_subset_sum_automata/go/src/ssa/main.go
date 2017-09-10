@@ -22,6 +22,7 @@ var options struct {
 	stepTime  int
 	seed      int
 	benchmark int
+	parallel  bool
 }
 
 func Print(w *World, wr io.Writer) {
@@ -63,6 +64,7 @@ func main() {
 	flag.IntVar(&options.stepTime, "steptime", 250, "time per step in milliseconds")
 	flag.IntVar(&options.benchmark, "benchmark", 0, "run benchmark of N steps and quit")
 	flag.IntVar(&options.seed, "seed", -1, "seed")
+	flag.BoolVar(&options.parallel, "parallel", false, "run in parallel")
 	flag.Parse()
 
 	if options.seed < 0 {
@@ -80,9 +82,14 @@ func main() {
 		}
 	}
 
+	stepFn := StepSerial
+	if options.parallel {
+		stepFn = StepParallel
+	}
+
 	if options.benchmark > 0 {
 		for i := 0; i < options.benchmark; i++ {
-			Step(w, wScratch, Cell(options.target), Cell(options.reward), Cell(options.penalty), Cell(options.max))
+			stepFn(w, wScratch, Cell(options.target), Cell(options.reward), Cell(options.penalty), Cell(options.max))
 			w, wScratch = wScratch, w
 		}
 		fmt.Println(w.Get(0, 0)) // Access results to ensure entire calculation cannot be removed by the optimizer.
@@ -115,7 +122,7 @@ func main() {
 			}
 		case <-ticker.C:
 			Print(w, os.Stdout)
-			Step(w, wScratch, Cell(options.target), Cell(options.reward), Cell(options.penalty), Cell(options.max))
+			stepFn(w, wScratch, Cell(options.target), Cell(options.reward), Cell(options.penalty), Cell(options.max))
 			w, wScratch = wScratch, w
 		}
 	}
