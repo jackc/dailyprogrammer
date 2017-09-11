@@ -1,0 +1,14 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    slop (4.5.0)
+
+PLATFORMS
+  java
+  ruby
+
+DEPENDENCIES
+  slop
+
+BUNDLED WITH
+   1.15.4
