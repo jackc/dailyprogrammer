@@ -103,11 +103,37 @@ func detectSubsetSum(w *World, x, y int, want Cell) bool {
 
 	for i := 1; i < 256; i++ {
 		sum := Cell(0)
-		for j := uint(0); j < uint(len(cells)); j++ {
+		for j := uint(0); j < 8; j++ {
 			if i&(1<<j) != 0 {
 				sum += cells[j]
 			}
 		}
+
+		// Manually unroll loop - makes huge difference since Go's optimizer as of 1.9 won't unroll this automatically.
+		// if i&(1<<0) != 0 {
+		// 	sum += cells[0]
+		// }
+		// if i&(1<<1) != 0 {
+		// 	sum += cells[1]
+		// }
+		// if i&(1<<2) != 0 {
+		// 	sum += cells[2]
+		// }
+		// if i&(1<<3) != 0 {
+		// 	sum += cells[3]
+		// }
+		// if i&(1<<4) != 0 {
+		// 	sum += cells[4]
+		// }
+		// if i&(1<<5) != 0 {
+		// 	sum += cells[5]
+		// }
+		// if i&(1<<6) != 0 {
+		// 	sum += cells[6]
+		// }
+		// if i&(1<<7) != 0 {
+		// 	sum += cells[7]
+		// }
 
 		if sum == want {
 			return true

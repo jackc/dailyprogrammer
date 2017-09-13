@@ -61,6 +61,32 @@ function detect_subset_sum(w, x, y, want) {
       }
     }
 
+    // Manually unrolling loop makes substantial difference
+    // if ((i&(1<<0)) !== 0) {
+    //   sum += cells[0];
+    // }
+    // if ((i&(1<<1)) !== 0) {
+    //   sum += cells[1];
+    // }
+    // if ((i&(1<<2)) !== 0) {
+    //   sum += cells[2];
+    // }
+    // if ((i&(1<<3)) !== 0) {
+    //   sum += cells[3];
+    // }
+    // if ((i&(1<<4)) !== 0) {
+    //   sum += cells[4];
+    // }
+    // if ((i&(1<<5)) !== 0) {
+    //   sum += cells[5];
+    // }
+    // if ((i&(1<<6)) !== 0) {
+    //   sum += cells[6];
+    // }
+    // if ((i&(1<<7)) !== 0) {
+    //   sum += cells[7];
+    // }
+
     if (sum === want) {
       return true;
     }
