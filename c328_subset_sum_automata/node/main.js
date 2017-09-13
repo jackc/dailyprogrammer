@@ -39,7 +39,7 @@ class World {
 }
 
 function detect_subset_sum(w, x, y, want) {
-  cells = [
+  const cells = [
     w.get(x-1, y-1),
     w.get(x, y-1),
     w.get(x+1, y-1),
@@ -52,15 +52,16 @@ function detect_subset_sum(w, x, y, want) {
     w.get(x+1, y+1)
   ];
 
+
   for (let i = 1; i < 256; i++) {
     let sum = 0;
     for (let j = 0; j < 8; j++) {
-      if (i&(1<<j) != 0) {
+      if ((i&(1<<j)) !== 0) {
         sum += cells[j];
       }
     }
 
-    if (sum == want) {
+    if (sum === want) {
       return true;
     }
   }
@@ -81,16 +82,13 @@ function step(curr, nxt, target, reward, penalty, max) {
       if (new_value < 0) new_value = 0;
       else if (new_value > max) new_value = max;
 
-      if (new_value < 0) new_value = 0;
-      else if (new_value > max) new_value = max;
-
       nxt.set(x, y, new_value);
     }
   }
 }
 
 function print_world(w) {
-  for (let i = 0; i < 80; i++) {
+  for (let i = 0; i < 20; i++) {
     process.stdout.write("\n");
   }
 
@@ -102,26 +100,34 @@ function print_world(w) {
   }
 }
 
-if (yargs.seed) srand.seed(yargs.seed);
-else srand.seed(Date.now());
-
 let w = new World(yargs.width, yargs.height);
 let w_scratch = new World(yargs.width, yargs.height);
+
+if (yargs.benchmark > 0) {
+  for (let y = 0; y < w.height; y++) {
+    for (let x = 0; x < w.width; x++) {
+      w.set(x, y, (y+x) % yargs.max);
+    }
+  }
+
+  for (let i = 0; i < yargs.benchmark; i++) {
+    step(w, w_scratch, yargs.target, yargs.reward, yargs.penalty, yargs.max);
+    let t = w;
+    w = w_scratch;
+    w_scratch = t;
+  }
+
+  print_world(w);
+  process.exit();
+}
+
+if (yargs.seed) srand.seed(yargs.seed);
+else srand.seed(Date.now());
 
 for (let y = 0; y < w.height; y++) {
   for (let x = 0; x < w.width; x++) {
     w.set(x, y, srand.rand() % (yargs.target+yargs.reward));
   }
-}
-
-if (yargs.benchmark > 0) {
-  for (let i = 0; i < yargs.benchmark; i++) {
-    step(w, w_scratch, yargs.target, yargs.reward, yargs.penalty, yargs.max);
-    w, w_scratch = w_scratch, w;
-  }
-
-  print_world(w);
-  process.exit();
 }
 
 setInterval(function() {

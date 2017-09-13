@@ -9,13 +9,7 @@ class World
 
   def idx_from_coord(x, y)
     x = x % width
-    if x < 0
-      x += width
-    end
     y = y % height
-    if y < 0
-      y += height
-    end
 
     y*width + x
   end
@@ -75,7 +69,7 @@ def step(curr, nxt, target, reward, penalty, max)
 end
 
 def print_world(w)
-  80.times { puts }
+  20.times { puts }
 
   w.height.times do |y|
     w.width.times do |x|
@@ -99,22 +93,18 @@ opts = Slop.parse do |o|
   o.integer '--width', 'width of the world', default: 30
 end
 
-if opts[:seed]
-  srand(opts[:seed])
-else
-  srand
-end
+
 
 w = World.new(opts[:width], opts[:height])
 w_scratch = World.new(opts[:width], opts[:height])
 
-w.height.times do |y|
-  w.width.times do |x|
-    w.set(x, y, rand(opts[:target]+opts[:reward]))
-  end
-end
-
 if opts[:benchmark] > 0
+  w.height.times do |y|
+    w.width.times do |x|
+      w.set(x, y, (y+x) % opts[:max])
+    end
+  end
+
   opts[:benchmark].times do
     step(w, w_scratch, opts[:target], opts[:reward], opts[:penalty], opts[:max])
     w, w_scratch = w_scratch, w
@@ -122,6 +112,18 @@ if opts[:benchmark] > 0
 
   print_world(w)
   exit 0
+end
+
+if opts[:seed]
+  srand(opts[:seed])
+else
+  srand
+end
+
+w.height.times do |y|
+  w.width.times do |x|
+    w.set(x, y, rand(opts[:target]+opts[:reward]))
+  end
 end
 
 while true

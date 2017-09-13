@@ -25,7 +25,7 @@ var options struct {
 	parallel  bool
 }
 
-func Print(w *World, wr io.Writer) {
+func Print(w *World) {
 	values := [16]rune{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'}
 
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
@@ -47,6 +47,15 @@ func Print(w *World, wr io.Writer) {
 	}
 
 	termbox.Flush()
+}
+
+func printWriter(w *World, wr io.Writer) {
+	for y := 0; y < w.Height(); y++ {
+		for x := 0; x < w.Width(); x++ {
+			fmt.Printf(" %x", w.Get(x, y))
+		}
+		fmt.Println()
+	}
 }
 
 func main() {
@@ -71,16 +80,8 @@ func main() {
 		options.seed = time.Now().Nanosecond()
 	}
 
-	rand.Seed(int64(options.seed))
-
 	w := NewWorld(options.width, options.height)
 	wScratch := NewWorld(options.width, options.height)
-
-	for y := 0; y < w.Height(); y++ {
-		for x := 0; x < w.Width(); x++ {
-			w.Set(x, y, Cell(rand.Intn(options.target+options.reward)))
-		}
-	}
 
 	stepFn := StepSerial
 	if options.parallel {
@@ -88,12 +89,26 @@ func main() {
 	}
 
 	if options.benchmark > 0 {
+		for y := 0; y < w.Height(); y++ {
+			for x := 0; x < w.Width(); x++ {
+				w.Set(x, y, Cell((y+x)%options.max))
+			}
+		}
+
 		for i := 0; i < options.benchmark; i++ {
 			stepFn(w, wScratch, Cell(options.target), Cell(options.reward), Cell(options.penalty), Cell(options.max))
 			w, wScratch = wScratch, w
 		}
-		fmt.Println(w.Get(0, 0)) // Access results to ensure entire calculation cannot be removed by the optimizer.
-		os.Exit(0)
+
+		printWriter(w, os.Stdout)
+		return
+	}
+
+	rand.Seed(int64(options.seed))
+	for y := 0; y < w.Height(); y++ {
+		for x := 0; x < w.Width(); x++ {
+			w.Set(x, y, Cell(rand.Intn(options.target+options.reward)))
+		}
 	}
 
 	err := termbox.Init()
@@ -121,7 +136,7 @@ func main() {
 				}
 			}
 		case <-ticker.C:
-			Print(w, os.Stdout)
+			Print(w)
 			stepFn(w, wScratch, Cell(options.target), Cell(options.reward), Cell(options.penalty), Cell(options.max))
 			w, wScratch = wScratch, w
 		}

@@ -78,7 +78,7 @@ config parse_command_line(int argc, char** argv) {
 
 template <class CellType>
 void print(world<CellType> w) {
-  std::cout << std::string(80, '\n');
+  std::cout << std::string(20, '\n');
 
   for (int32_t y = 0; y < w.get_height(); y++) {
     for (int32_t x = 0; x < w.get_width(); x++) {
@@ -266,6 +266,21 @@ int main(int argc, char** argv) {
       stepper.reset(new stepper_serial<int16_t>);
     }
 
+    if (config.benchmark > 0) {
+      for (int32_t y = 0; y < w.get_height(); y++) {
+        for (int32_t x = 0; x < w.get_width(); x++) {
+          w.set(x, y, (y+x) % config.max);
+        }
+      }
+
+      for (int64_t i = 0; i < config.benchmark; i++) {
+        stepper->step(w, w_scratch, config.target, config.reward, config.penalty, config.max);
+        std::swap(w, w_scratch);
+      }
+      print(w); // Access results to ensure entire calculation cannot be removed by the optimizer.
+      std::exit(0);
+    }
+
     std::default_random_engine prng;
     if (config.seed != -1) {
       prng.seed(config.seed);
@@ -279,15 +294,6 @@ int main(int argc, char** argv) {
       for (int32_t x = 0; x < w.get_width(); x++) {
         w.set(x, y, distribution(prng));
       }
-    }
-
-    if (config.benchmark > 0) {
-      for (int64_t i = 0; i < config.benchmark; i++) {
-        stepper->step(w, w_scratch, config.target, config.reward, config.penalty, config.max);
-        std::swap(w, w_scratch);
-      }
-      print(w); // Access results to ensure entire calculation cannot be removed by the optimizer.
-      std::exit(0);
     }
 
     while (true) {
