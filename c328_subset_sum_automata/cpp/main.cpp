@@ -82,7 +82,7 @@ void print(world<CellType> w) {
 
   for (int32_t y = 0; y < w.get_height(); y++) {
     for (int32_t x = 0; x < w.get_width(); x++) {
-      std::cout << std::right << std::setw(3) << w.get(x, y);
+      std::cout << std::hex << std::setw(2) << w.get(x, y);
     }
     std::cout << "\n";
   }
