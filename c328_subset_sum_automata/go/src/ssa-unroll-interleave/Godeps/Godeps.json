@@ -1,0 +1,16 @@
+{
+	"ImportPath": "ssa",
+	"GoVersion": "go1.9",
+	"GodepVersion": "v79",
+	"Deps": [
+		{
+			"ImportPath": "github.com/mattn/go-runewidth",
+			"Comment": "v0.0.2-3-g97311d9",
+			"Rev": "97311d9f7767e3d6f422ea06661bc2c7a19e8a5d"
+		},
+		{
+			"ImportPath": "github.com/nsf/termbox-go",
+			"Rev": "4ed959e0540971545eddb8c75514973d670cf739"
+		}
+	]
+}
