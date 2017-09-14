@@ -50,6 +50,34 @@ def detect_subset_sum(w, x, y, want)
     end
   end
 
+  # local variables are faster than array access
+  # c0 = w.get(x-1, y-1)
+  # c1 = w.get(x, y-1)
+  # c2 = w.get(x+1, y-1)
+  # c3 = w.get(x-1, y)
+  # c4 = w.get(x+1, y)
+  # c5 = w.get(x-1, y+1)
+  # c6 = w.get(x, y+1)
+  # c7 = w.get(x+1, y+1)
+
+  # (1...256).each do |i|
+  #   sum = 0
+
+  # loop unrolling makes significant improvement in performance
+  #   sum += c0 if i&1 != 0
+  #   sum += c1 if i&2 != 0
+  #   sum += c2 if i&4 != 0
+  #   sum += c3 if i&8 != 0
+  #   sum += c4 if i&16 != 0
+  #   sum += c5 if i&32 != 0
+  #   sum += c6 if i&64 != 0
+  #   sum += c7 if i&128 != 0
+
+  #   if sum == want
+  #     return true
+  #   end
+  # end
+
   false
 end
 
