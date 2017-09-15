@@ -106,66 +106,61 @@ func detectSubsetSum(w *World, x, y int, want Cell) bool {
 
 	for j < 256 {
 		iSum := Cell(0)
-		jSum := Cell(0)
 
 		if i&(1<<0) != 0 {
 			iSum += cells[0]
 		}
-		if j&(1<<0) != 0 {
-			jSum += cells[0]
-		}
-
 		if i&(1<<1) != 0 {
 			iSum += cells[1]
 		}
-		if j&(1<<1) != 0 {
-			jSum += cells[1]
-		}
-
 		if i&(1<<2) != 0 {
 			iSum += cells[2]
 		}
-		if j&(1<<2) != 0 {
-			jSum += cells[2]
-		}
-
 		if i&(1<<3) != 0 {
 			iSum += cells[3]
 		}
-		if j&(1<<3) != 0 {
-			jSum += cells[3]
-		}
-
 		if i&(1<<4) != 0 {
 			iSum += cells[4]
 		}
-		if j&(1<<4) != 0 {
-			jSum += cells[4]
-		}
-
 		if i&(1<<5) != 0 {
 			iSum += cells[5]
 		}
-		if j&(1<<5) != 0 {
-			jSum += cells[5]
-		}
-
 		if i&(1<<6) != 0 {
 			iSum += cells[6]
 		}
-		if j&(1<<6) != 0 {
-			jSum += cells[6]
-		}
-
 		if i&(1<<7) != 0 {
 			iSum += cells[7]
-		}
-		if j&(1<<7) != 0 {
-			jSum += cells[7]
 		}
 
 		if iSum == want {
 			return true
+		}
+
+		jSum := Cell(0)
+
+		if j&(1<<0) != 0 {
+			jSum += cells[0]
+		}
+		if j&(1<<1) != 0 {
+			jSum += cells[1]
+		}
+		if j&(1<<2) != 0 {
+			jSum += cells[2]
+		}
+		if j&(1<<3) != 0 {
+			jSum += cells[3]
+		}
+		if j&(1<<4) != 0 {
+			jSum += cells[4]
+		}
+		if j&(1<<5) != 0 {
+			jSum += cells[5]
+		}
+		if j&(1<<6) != 0 {
+			jSum += cells[6]
+		}
+		if j&(1<<7) != 0 {
+			jSum += cells[7]
 		}
 
 		if jSum == want {
