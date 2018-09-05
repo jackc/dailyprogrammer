@@ -1,0 +1,8 @@
+[package]
+name = "c364_dice_roller"
+version = "0.1.0"
+authors = ["Jack Christensen <jack@jackchristensen.com>"]
+
+[dependencies]
+rand = "0.5.5"
+regex = "1"
