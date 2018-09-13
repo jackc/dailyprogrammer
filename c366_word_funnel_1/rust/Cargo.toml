@@ -1,0 +1,6 @@
+[package]
+name = "word_funnel_1"
+version = "0.1.0"
+authors = ["Jack Christensen <jack@jackchristensen.com>"]
+
+[dependencies]
